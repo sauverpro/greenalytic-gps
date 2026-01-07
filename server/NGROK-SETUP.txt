@@ -1,0 +1,116 @@
+===============================================================================
+  NGROK SETUP GUIDE - GPS TCP Tunnel
+===============================================================================
+
+Your server is now configured to use ngrok to expose the GPS TCP port to the
+internet without needing router access or port forwarding!
+
+===============================================================================
+STEP 1: GET NGROK AUTHTOKEN (One-time setup)
+===============================================================================
+
+1. Go to: https://dashboard.ngrok.com/signup
+   - Sign up for a FREE ngrok account (no credit card required)
+
+2. After login, go to: https://dashboard.ngrok.com/get-started/your-authtoken
+   - Copy your authtoken (looks like: 2abc123def456ghi789jkl...)
+
+3. Open the .env file in this folder and add your token:
+   
+   NGROK_AUTHTOKEN=paste_your_token_here
+
+   Save the file.
+
+===============================================================================
+STEP 2: START THE SERVER
+===============================================================================
+
+Run the server:
+   npm start
+
+You will see output like:
+
+   ======================================================================
+   ✅ NGROK TUNNEL ACTIVE
+   ======================================================================
+   📡 Public GPS endpoint: tcp://0.tcp.ngrok.io:12345
+   
+   📱 SMS Command for GPS Device:
+   ======================================================================
+   SERVER,1,0.tcp.ngrok.io,12345,0#
+   ======================================================================
+
+===============================================================================
+STEP 3: CONFIGURE YOUR GPS DEVICE
+===============================================================================
+
+Send the SMS command shown in the terminal output to your GPS device.
+
+Example:
+   SERVER,1,0.tcp.ngrok.io,12345,0#
+
+The GPS device should respond with:
+   SERVER_OK
+
+===============================================================================
+STEP 4: MONITOR GPS CONNECTIONS
+===============================================================================
+
+Keep the terminal open and watch for GPS connections:
+
+   tail -f gps-data.log
+
+You should see:
+   [timestamp] 🔌 Device connected: XX.XX.XX.XX:XXXXX
+   [timestamp] 📥 Data from...
+   [timestamp] 📡 Raw GPS data: ...
+   [timestamp] ✅ Location saved for device ...
+
+===============================================================================
+IMPORTANT NOTES:
+===============================================================================
+
+✅ FREE NGROK ACCOUNT:
+   - Tunnel URL changes each time you restart the server
+   - You'll need to update GPS device config after each restart
+   - This is perfect for development and testing
+
+💎 NGROK PAID ACCOUNT ($8/month):
+   - Fixed TCP address that never changes
+   - Your GPS device stays configured permanently
+   - Recommended for production use
+
+🔒 SECURITY:
+   - ngrok provides HTTPS for web traffic automatically
+   - TCP connections are directly forwarded (no encryption)
+   - Your GPS data is as secure as the device's protocol
+
+⚡ PERFORMANCE:
+   - Minimal latency (usually <50ms added)
+   - Suitable for real-time GPS tracking
+   - Free tier has bandwidth limits (check ngrok dashboard)
+
+===============================================================================
+TROUBLESHOOTING:
+===============================================================================
+
+ERROR: "authtoken not found"
+   → Add NGROK_AUTHTOKEN to .env file
+
+ERROR: "failed to start tunnel"
+   → Check internet connection
+   → Verify authtoken is correct
+   → Check ngrok dashboard for active tunnels
+
+GPS NOT CONNECTING:
+   → Verify you sent the exact command from terminal output
+   → Check GPS device has cellular signal
+   → Monitor gps-data.log for connection attempts
+   → Verify GPS device supports TCP protocol
+
+TUNNEL URL KEEPS CHANGING:
+   → This is normal with free account
+   → Upgrade to paid plan for fixed address
+   → Or restart server less frequently
+
+===============================================================================

@@ -1,0 +1,25 @@
+{
+  "name": "greenAlytics-server",
+  "version": "1.0.0",
+  "description": "GPS tracking server for greenAlytics dashboard",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch src/index.js",
+    "start": "node src/index.js",
+    "tcp": "node src/tcpServer.js",
+    "seed": "node src/seed.js",
+    "monitor": "node monitor-gps.js"
+  },
+  "dependencies": {
+    "@ngrok/ngrok": "^1.6.0",
+    "bcrypt": "^5.1.1",
+    "cors": "^2.8.5",
+    "date-fns": "^3.6.0",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.2",
+    "localtunnel": "^2.0.2",
+    "pg": "^8.11.3"
+  }
+}

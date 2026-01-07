@@ -1,0 +1,153 @@
+===============================================================================
+  GPS CELLULAR CONNECTION SETUP GUIDE
+===============================================================================
+
+Your GPS device is using cellular data (SIM card), so it's connecting from 
+the internet, not your local network.
+
+CURRENT STATUS:
+✅ Server listening on 0.0.0.0:8800 (all interfaces)
+✅ GPS device acknowledged config: SERVER_OK
+❌ No data being received
+
+PROBLEM:
+The IP address 102.22.171.14 you sent to the GPS might not be correct, or
+your router is not forwarding traffic from the internet to your server.
+
+===============================================================================
+STEP-BY-STEP FIX:
+===============================================================================
+
+STEP 1: VERIFY YOUR PUBLIC IP ADDRESS
+--------------------------------------
+Your GPS device sent to: 102.22.171.14
+
+Is this your actual public IP? Check by:
+- Open browser: https://whatismyipaddress.com/
+- Or run: curl ifconfig.me
+- Or Google: "what is my ip"
+
+If 102.22.171.14 is NOT your real IP:
+→ Resend command with correct IP: SERVER,1,YOUR_REAL_IP,8800,0#
+
+
+STEP 2: CONFIGURE ROUTER PORT FORWARDING
+-----------------------------------------
+Your router must forward incoming traffic on port 8800 to your computer.
+
+A. Access your router:
+   - Open browser: http://192.168.1.1 (or check router label)
+   - Login with router admin credentials
+
+B. Find Port Forwarding section:
+   - Usually under: Advanced > Port Forwarding or Virtual Server
+   - Or: NAT > Port Forwarding
+
+C. Add new rule:
+   ┌─────────────────────────────────────────┐
+   │ Service Name:    GPS Server             │
+   │ External Port:   8800                   │
+   │ Internal IP:     192.168.1.76          │
+   │ Internal Port:   8800                   │
+   │ Protocol:        TCP                    │
+   │ Status:          Enabled                │
+   └─────────────────────────────────────────┘
+
+D. Save and apply changes
+
+
+STEP 3: CONFIGURE WINDOWS FIREWALL (RUN AS ADMINISTRATOR)
+----------------------------------------------------------
+Open PowerShell or Command Prompt as Administrator and run:
+
+netsh advfirewall firewall add rule name="GPS Server TCP 8800" dir=in action=allow protocol=TCP localport=8800
+
+Or manually:
+1. Windows Security > Firewall & network protection
+2. Advanced settings
+3. Inbound Rules > New Rule
+4. Port > TCP > Specific local ports: 8800
+5. Allow the connection > All profiles
+6. Name: GPS Server TCP 8800
+
+
+STEP 4: TEST THE CONNECTION
+----------------------------
+After configuring router and firewall:
+
+1. Keep the server running (it's already running)
+
+2. Monitor for GPS connections:
+   tail -f gps-data.log
+
+3. The GPS device should connect automatically, or resend SMS:
+   SERVER,1,YOUR_PUBLIC_IP,8800,0#
+
+4. You should see in gps-data.log:
+   [timestamp] 🔌 Device connected: XX.XX.XX.XX:XXXXX
+   [timestamp] 📥 Data from...
+
+
+STEP 5: VERIFY GPS IS SENDING DATA
+-----------------------------------
+If connection works but no location data:
+
+- Check GPS device has valid GPS signal
+- Check GPS device is configured to send data periodically
+- Some GPS devices need additional commands like:
+  * TIMER,10# (send data every 10 seconds)
+  * UPLOAD,10# (upload interval 10 seconds)
+
+
+===============================================================================
+TROUBLESHOOTING:
+===============================================================================
+
+ISSUE: Still no connection after setup
+--------------------------------------
+1. Check if your ISP blocks incoming connections
+   - Some ISPs (mobile/residential) block all incoming ports
+   - You may need to upgrade to "business" plan or use VPS
+
+2. Dynamic IP changing
+   - Your public IP might change frequently
+   - Consider using Dynamic DNS (DDNS) service like No-IP or DuckDNS
+
+3. Check router supports port forwarding
+   - Some ISP routers have port forwarding disabled
+   - May need to enable "DMZ" for your computer (less secure)
+
+
+ISSUE: GPS connects but sends wrong format
+-------------------------------------------
+Current parser expects:
+IMEI,timestamp,lat,lon,speed,direction,mileage,gpsSignal,gsmSignal,carState,deviceState,alarmState
+
+Check gps-data.log for the actual format being received and we can adjust parser.
+
+
+ISSUE: Connection drops frequently
+-----------------------------------
+- GPS devices often disconnect after sending data
+- This is normal behavior
+- Each new location update = new connection
+- Check if data is being saved to database despite disconnects
+
+
+===============================================================================
+CURRENT SERVER STATUS:
+===============================================================================
+✅ TCP Server: Listening on 0.0.0.0:8800
+✅ HTTP Server: Running on port 3001
+✅ Database: Connected and ready
+✅ Log file: gps-data.log
+
+GPS Command sent to device:
+SERVER,1,102.22.171.14,8800,0#
+
+Device response:
+SERVER_OK,Currently in use Server:1,102.22.171.14,8800,0;
+
+Next: Verify 102.22.171.14 is your actual public IP and set up port forwarding!
+
+===============================================================================
