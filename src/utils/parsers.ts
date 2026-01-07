@@ -164,7 +164,7 @@ export function parseBatteryValue(betteryV: number): { isPercentage: boolean; va
  * Format: "lon,lat,time,speed,direction,bool#data$value#data"
  */
 export function parseTrackPoint(dataString: string): any {
-  const [coordPart, ...rest] = dataString.split(',');
+  const [, ...rest] = dataString.split(',');
   const parts = rest.join(',').split('bool#');
   const [lon, lat, timestamp, speed, direction] = dataString.split(',').slice(0, 5);
 

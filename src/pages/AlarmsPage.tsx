@@ -1,11 +1,10 @@
-import React from 'react';
 import { useRealtimeAlarms } from '../hooks/useAlarms';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
 import { AlertTriangle, Clock, MapPin, CheckCircle } from 'lucide-react';
 import { ALARM_TYPES } from '../utils/constants';
 
 export default function AlarmsPage() {
-  const { data: alarms, isLoading, error } = useRealtimeAlarms();
+  const { data: alarms, isLoading, error } = useRealtimeAlarms('');
 
   if (isLoading) {
     return (
@@ -24,8 +23,8 @@ export default function AlarmsPage() {
   }
 
   const getAlarmTypeName = (type: number): string => {
-    const alarmType = ALARM_TYPES.find((a) => a.value === type);
-    return alarmType?.label || `Unknown (${type})`;
+    const alarmType = ALARM_TYPES[type as keyof typeof ALARM_TYPES];
+    return alarmType?.name || `Unknown (${type})`;
   };
 
   const getAlarmSeverity = (type: number): 'high' | 'medium' | 'low' => {
@@ -59,12 +58,12 @@ export default function AlarmsPage() {
         </div>
         <div className="flex items-center gap-4">
           <div className="text-sm">
-            <span className="font-medium">{alarms?.length || 0}</span> active alarms
+            <span className="font-medium">{alarms?.rows?.length || 0}</span> active alarms
           </div>
         </div>
       </div>
 
-      {!alarms || alarms.length === 0 ? (
+      {!alarms?.rows || alarms.rows.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center">
             <CheckCircle className="h-12 w-12 mx-auto mb-4 text-green-600" />
@@ -76,7 +75,7 @@ export default function AlarmsPage() {
         </Card>
       ) : (
         <div className="space-y-4">
-          {alarms.map((alarm) => {
+          {alarms.rows.map((alarm: any) => {
             const severity = getAlarmSeverity(alarm.alarmType);
             const severityStyles = getSeverityStyles(severity);
 

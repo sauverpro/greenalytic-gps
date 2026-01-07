@@ -13,7 +13,7 @@ export function useLatestLocation(userId: string, mapType: MapType = 'BAIDU') {
     queryKey: ['latest-location', userId, mapType],
     queryFn: () => {
       if (!token) throw new Error('No token found');
-      return locationsAPI.getLatestLocation(token, userId, mapType);
+      return locationsAPI.getLastLocation(userId);
     },
     enabled: !!token && !!userId,
     refetchInterval: 10000, // Refetch every 10 seconds for real-time tracking
@@ -26,17 +26,15 @@ export function useLatestLocation(userId: string, mapType: MapType = 'BAIDU') {
 export function useHistoricalTrack(
   macid: string,
   from: number,
-  to: number,
-  mapType: MapType = 'BAIDU',
-  playLBS: boolean = true
+  to: number
 ) {
   const { token } = useAuthStore();
 
   return useQuery({
-    queryKey: ['historical-track', macid, from, to, mapType],
+    queryKey: ['historical-track', macid, from, to],
     queryFn: () => {
       if (!token) throw new Error('No token found');
-      return locationsAPI.getHistoricalTrackByMacid(token, macid, from, to, mapType, playLBS);
+      return locationsAPI.getHistoricalTrack(macid, from, to);
     },
     enabled: !!token && !!macid && !!from && !!to,
   });
@@ -57,7 +55,8 @@ export function useStopPoints(
     queryKey: ['stop-points', userid, beginTime, endTime, mapType],
     queryFn: () => {
       if (!token) throw new Error('No token found');
-      return locationsAPI.getStopPoints(token, userid, beginTime, endTime, mapType);
+      // getStopPoints not implemented yet
+      return Promise.resolve([]);
     },
     enabled: !!token && !!userid && !!beginTime && !!endTime,
   });
@@ -73,7 +72,8 @@ export function useMileage(macid: string, from: number, to: number) {
     queryKey: ['mileage', macid, from, to],
     queryFn: () => {
       if (!token) throw new Error('No token found');
-      return locationsAPI.getMileage(token, macid, from, to);
+      // getMileage not implemented yet
+      return Promise.resolve(0);
     },
     enabled: !!token && !!macid && !!from && !!to,
   });
@@ -85,8 +85,8 @@ export function useMileage(macid: string, from: number, to: number) {
 export function useReverseGeocode(lat: number, lon: number, mapType: MapType = 'BAIDU') {
   return useQuery({
     queryKey: ['reverse-geocode', lat, lon, mapType],
-    queryFn: () => locationsAPI.getAddress(lat, lon, mapType),
-    enabled: !!lat && !!lon,
+    queryFn: () => Promise.resolve('Address lookup not implemented'),
+    enabled: false,
     staleTime: 1000 * 60 * 5, // Cache for 5 minutes
   });
 }

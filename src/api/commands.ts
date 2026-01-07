@@ -1,5 +1,5 @@
 import apiClient, { buildQueryString } from './client';
-import type { Command, CommandResult, CommandHistory, ApiResponse } from '../types';
+import type { CommandResult, CommandHistory, ApiResponse } from '../types';
 
 /**
  * Command Control API endpoints
