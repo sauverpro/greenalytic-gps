@@ -183,7 +183,10 @@ cd /var/www/greenallytics
 
 ```bash
 # Clone your repository (replace with your actual repo URL)
-git clone https://github.com/YOUR_USERNAME/YOUR_REPO.git .
+git clone https://github.com/sauverpro/greenalytic-gps.git .
+
+# Fix Git ownership (important for git pull later)
+git config --global --add safe.directory /var/www/greenallytics
 
 # Verify files are there
 ls -la
@@ -635,6 +638,14 @@ ssh root@10.10.135.196
 # Navigate to app directory
 cd /var/www/greenallytics
 
+# If you get "dubious ownership" error, run:
+git config --global --add safe.directory /var/www/greenallytics
+
+# If you have local changes that conflict:
+git stash  # Save local changes
+# OR
+git reset --hard origin/main  # Discard local changes (use with caution)
+
 # Pull latest changes
 git pull origin main
 
@@ -652,6 +663,8 @@ sudo systemctl restart greenallytics-backend
 sudo systemctl status greenallytics-backend
 sudo journalctl -u greenallytics-backend -n 20
 ```
+
+**Note**: If you get merge conflicts, use `git reset --hard origin/main` to force overwrite with the latest GitHub code.
 
 ---
 
