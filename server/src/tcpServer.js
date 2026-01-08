@@ -110,12 +110,12 @@ function parseGT06Protocol(data) {
       // Latitude (4 bytes)
       const latValue = (data[offset] << 24) | (data[offset + 1] << 16) | (data[offset + 2] << 8) | data[offset + 3];
       offset += 4;
-      const lat = latValue / 1800000.0;
+      let lat = latValue / 1800000.0;
 
       // Longitude (4 bytes)
       const lonValue = (data[offset] << 24) | (data[offset + 1] << 16) | (data[offset + 2] << 8) | data[offset + 3];
       offset += 4;
-      const lon = lonValue / 1800000.0;
+      let lon = lonValue / 1800000.0;
 
       // Speed (1 byte in km/h)
       const speed = data[offset++];
@@ -125,6 +125,14 @@ function parseGT06Protocol(data) {
       offset += 2;
       const direction = courseStatus & 0x03FF; // Lower 10 bits
       const gpsFixed = (courseStatus & 0x1000) !== 0; // Bit 12
+      
+      // Check hemisphere bits
+      const latSouth = (courseStatus & 0x0400) !== 0; // Bit 10: 1=South, 0=North
+      const lonWest = (courseStatus & 0x0800) !== 0; // Bit 11: 1=West, 0=East
+      
+      // Apply hemisphere corrections
+      if (latSouth) lat = -lat;
+      if (lonWest) lon = -lon;
 
       logGPS(`📍 Location - Lat: ${lat.toFixed(6)}, Lon: ${lon.toFixed(6)}, Speed: ${speed}km/h, Direction: ${direction}°, GPS: ${gpsFixed}`);
 
