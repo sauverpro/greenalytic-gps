@@ -126,15 +126,11 @@ function parseGT06Protocol(data) {
       const direction = courseStatus & 0x03FF; // Lower 10 bits
       const gpsFixed = (courseStatus & 0x1000) !== 0; // Bit 12
 
-      // Get IMEI from previous login (we'll use a stored value)
-      const imeiBytes = data.slice(startBit + 10, startBit + 18);
-      const imei = imeiBytes.map(b => b.toString(16).padStart(2, '0')).join('');
-
       logGPS(`📍 Location - Lat: ${lat.toFixed(6)}, Lon: ${lon.toFixed(6)}, Speed: ${speed}km/h, Direction: ${direction}°, GPS: ${gpsFixed}`);
 
       return {
         type: 'location',
-        strTEID: imei || 'unknown',
+        strTEID: 'unknown', // Will be filled from stored IMEI in deviceIMEIs map
         nTime: timestamp,
         dbLat: lat,
         dbLon: lon,
